@@ -1,0 +1,27 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Hardhat artifacts and cache
+artifacts/
+cache/
+
+# Environment variables
+.env
+
+# VS Code settings
+.vscode/
+
+# Coverage reports
+coverage/
+
+# Compiled contracts
+*.json
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
