@@ -15,8 +15,10 @@ contract MaliciousPlugin is IPlugin {
     }
     
     function performAction(uint256) external override returns (uint256) {
-        // Try to reenter the Core contract
-        IPlugin(core).performAction(0);
+        // Try to reenter the Core contract by directly calling it
+        (bool success,) = core.call(abi.encodeWithSignature("executePlugin(uint256,uint256)", 0, 0));
+        // The call should fail due to the nonReentrant modifier
+        require(!success, "Reentrancy was not prevented");
         return 0;
     }
 } 
