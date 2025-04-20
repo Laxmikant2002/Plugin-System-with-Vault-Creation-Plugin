@@ -1,85 +1,106 @@
-# Solidity Modular Plugin System
+# Solidity Modular Plugin System with Vault Creation Plugin
 
-This project implements a modular plugin system for Solidity smart contracts, allowing for dynamic extension of functionality through plugins.
+## Objective
+This project demonstrates a modular, plugin-based architecture for Solidity smart contracts. The `Core` contract enables dynamic extension of functionality through plugins, such as a simple multiplier plugin and a vault creation plugin.
 
 ## Features
+- **Core Contract**: Manages a registry of plugins and dynamically dispatches calls to them.
+- **Plugin Interface**: Standardized interface (`IPlugin`) for all plugins.
+- **Example Plugin**: Multiplies an input by a constant factor.
+- **Vault Creation Plugin**: Creates and manages vaults with unique identifiers.
 
-- Core contract that maintains a registry of plugins
-- Standardized plugin interface (IPlugin)
-- Example plugin demonstrating simple functionality
-- Vault creation plugin for managing vaults
-- Access control for plugin management
-- Comprehensive test suite
+## Requirements
+- Solidity version: `0.8.20`
+- Libraries: OpenZeppelin's `Ownable` and `ReentrancyGuard`
 
-## Contracts
+## Project Structure
+```
+contracts/
+  Core.sol            # Main contract managing plugins
+  IPlugin.sol         # Plugin interface
+  ExamplePlugin.sol   # Simple multiplier plugin
+  VaultPlugin.sol     # Vault creation plugin
+  MaliciousPlugin.sol # Plugin for testing reentrancy
 
-- `Core.sol`: Main contract that manages the plugin registry
-- `IPlugin.sol`: Interface that all plugins must implement
-- `ExamplePlugin.sol`: Simple plugin that multiplies input by 2
-- `VaultPlugin.sol`: Plugin for creating and managing vaults
+test/
+  PluginSystem.test.js # Test suite for the system
 
-## Setup
-
-1. Install dependencies:
-```bash
-npm install
+hardhat.config.js     # Hardhat configuration
+package.json          # Project dependencies and scripts
 ```
 
-2. Compile contracts:
+## Setup Instructions
+
+### Prerequisites
+- Node.js and npm installed
+- Hardhat installed globally or locally in the project
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd Plugin-System
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Compilation
+Compile the smart contracts:
 ```bash
-npm run compile
+npx hardhat compile
 ```
 
-3. Run tests:
+### Testing
+Run the test suite:
 ```bash
-npm test
+npx hardhat test
 ```
+
+## Deployment
+1. Deploy the `Core` contract:
+   ```javascript
+   const Core = await ethers.getContractFactory("Core");
+   const core = await Core.deploy();
+   await core.deployed();
+   console.log("Core deployed to:", core.address);
+   ```
+2. Deploy plugins and register them with the `Core` contract:
+   ```javascript
+   const ExamplePlugin = await ethers.getContractFactory("ExamplePlugin");
+   const examplePlugin = await ExamplePlugin.deploy();
+   await examplePlugin.deployed();
+   await core.addPlugin(examplePlugin.address);
+
+   const VaultPlugin = await ethers.getContractFactory("VaultPlugin");
+   const vaultPlugin = await VaultPlugin.deploy();
+   await vaultPlugin.deployed();
+   await core.addPlugin(vaultPlugin.address);
+   ```
 
 ## Usage
+1. Execute a plugin action:
+   ```javascript
+   const result = await core.executePlugin(0, 5); // Calls ExamplePlugin
+   console.log("Result:", result.toString());
+   ```
+2. Create a vault:
+   ```javascript
+   const vaultId = await core.executePlugin(1, 100); // Calls VaultPlugin
+   console.log("Vault ID:", vaultId.toString());
+   ```
 
-### Deploying Contracts
-
-1. Deploy the Core contract
-2. Deploy your plugins
-3. Register plugins with the Core contract using `addPlugin`
-
-### Example Usage
-
-```javascript
-// Deploy contracts
-const core = await Core.deploy();
-const examplePlugin = await ExamplePlugin.deploy();
-const vaultPlugin = await VaultPlugin.deploy();
-
-// Register plugins
-await core.addPlugin(examplePlugin.address);
-await core.addPlugin(vaultPlugin.address);
-
-// Use plugins
-const result = await core.executePlugin(0, 5); // ExamplePlugin: returns 10
-const vaultId = await core.executePlugin(1, 100); // VaultPlugin: creates vault with initial balance 100
-```
-
-## Testing
-
+## Testing Details
 The test suite verifies:
-- Plugin registration and management
-- Example plugin functionality
-- Vault creation and management
-- Access control
+- Only the owner can manage plugins.
+- Plugins execute correctly and return expected results.
+- Vaults are created with unique IDs.
+- Reentrancy attacks are prevented.
 
-Run the tests with:
-```bash
-npm test
-```
-
-## Security Considerations
-
-- Only the contract owner can manage plugins
-- Plugins are isolated from each other
-- Input validation is performed for all operations
-- Events are emitted for important state changes
+## Additional Notes
+- The project uses OpenZeppelin's `Ownable` for access control and `ReentrancyGuard` for reentrancy protection.
+- The `MaliciousPlugin` contract is included to test reentrancy protection.
 
 ## License
-
-MIT 
+This project is licensed under the MIT License.
