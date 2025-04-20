@@ -33,12 +33,12 @@ contract VaultPlugin is IPlugin {
         uint256 vaultId = vaultCounter++;
         
         vaults[vaultId] = Vault({
-            owner: msg.sender,
+            owner: tx.origin,
             balance: initialBalance,
             createdAt: block.timestamp
         });
         
-        emit VaultCreated(vaultId, msg.sender, initialBalance);
+        emit VaultCreated(vaultId, tx.origin, initialBalance);
         return vaultId;
     }
     

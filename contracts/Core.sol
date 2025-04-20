@@ -26,6 +26,7 @@ contract Core is Ownable, ReentrancyGuard {
     error InvalidPluginID();
     error PluginAlreadyRegistered();
     error IndexOutOfBounds();
+    error PluginNotRegistered();
     
     constructor() Ownable(msg.sender) {}
     
@@ -80,7 +81,7 @@ contract Core is Ownable, ReentrancyGuard {
 
         address pluginAddress = plugins[pluginId];
         if (!isPlugin[pluginAddress]) {
-            revert PluginAlreadyRegistered();
+            revert PluginNotRegistered();
         }
 
         IPlugin plugin = IPlugin(pluginAddress);
@@ -102,7 +103,7 @@ contract Core is Ownable, ReentrancyGuard {
      */
     function getPlugin(uint256 index) external view returns (address) {
         if (index >= plugins.length) {
-            revert("Index out of bounds");
+            revert IndexOutOfBounds();
         }
         return plugins[index];
     }
